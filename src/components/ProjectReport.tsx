@@ -2,12 +2,13 @@ import React from 'react';
 import { ProjectData, CalculatedResults } from '../types';
 import { formatCurrency, formatPercentage } from '../utils/formatting';
 import { generatePDFReport } from '../utils/pdfGenerator';
-import { 
-  FileText, 
-  User, 
-  MapPin, 
-  Building, 
-  DollarSign, 
+import { generateHTMLReport } from '../utils/htmlGenerator';
+import {
+  FileText,
+  User,
+  MapPin,
+  Building,
+  DollarSign,
   TrendingUp,
   PieChart,
   BarChart3,
@@ -15,7 +16,8 @@ import {
   Target,
   AlertTriangle,
   CheckCircle,
-  Download
+  Download,
+  Globe
 } from 'lucide-react';
 
 interface ProjectReportProps {
@@ -57,12 +59,28 @@ export const ProjectReport: React.FC<ProjectReportProps> = ({
     }
   };
 
+  const handleDownloadHTML = () => {
+    try {
+      generateHTMLReport(projectData, calculatedResults);
+    } catch (error) {
+      console.error('Error generating HTML:', error);
+      alert('Error generating HTML. Please try again.');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Report Header */}
       <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
         <div className="text-center">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end gap-3 mb-4">
+            <button
+              onClick={handleDownloadHTML}
+              className="flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            >
+              <Globe className="h-5 w-5 mr-2" />
+              Download HTML Report
+            </button>
             <button
               onClick={handleDownloadPDF}
               className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"

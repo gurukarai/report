@@ -147,7 +147,11 @@ export const generatePDFReport = async (
       theme: 'grid',
       headStyles: { fillColor: [66, 139, 202] },
       margin: { left: margin, right: margin },
-      styles: { fontSize: 10, cellPadding: 4 }
+      styles: { fontSize: 10, cellPadding: 4 },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 'auto', overflow: 'linebreak' }
+      }
     });
 
     yPosition = (pdf as any).lastAutoTable.finalY + 15;
@@ -182,7 +186,11 @@ export const generatePDFReport = async (
       theme: 'grid',
       headStyles: { fillColor: [66, 139, 202] },
       margin: { left: margin, right: margin },
-      styles: { fontSize: 10, cellPadding: 4 }
+      styles: { fontSize: 10, cellPadding: 4 },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 'auto', overflow: 'linebreak' }
+      }
     });
 
     yPosition = (pdf as any).lastAutoTable.finalY + 15;
