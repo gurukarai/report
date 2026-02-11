@@ -65,10 +65,10 @@ const CSV_HEADERS = [
 
 // Helper function to escape CSV values
 const escapeCSVValue = (value: string): string => {
-  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
+  // Always quote values for better CSV compatibility
+  // Escape any internal quotes by doubling them
+  const escapedValue = value.replace(/"/g, '""');
+  return `"${escapedValue}"`;
 };
 
 // Helper function to parse CSV values
@@ -82,22 +82,22 @@ const parseCSVValue = (value: string): string => {
 // Export project data to CSV format
 export const exportToCSV = (projectData: ProjectData): void => {
   try {
-    // Create CSV header row
-    const headerRow = CSV_HEADERS.join(',');
-    
+    // Create CSV header row with quoted values
+    const headerRow = CSV_HEADERS.map(header => escapeCSVValue(header)).join(',');
+
     // Create data row
     const dataRow = CSV_HEADERS.map(header => {
       const value = projectData[header as keyof ProjectData] || '';
       return escapeCSVValue(value);
     }).join(',');
-    
+
     // Combine header and data
     const csvContent = `${headerRow}\n${dataRow}`;
-    
+
     // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
