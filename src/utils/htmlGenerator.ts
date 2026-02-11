@@ -202,14 +202,19 @@ export const generateHTMLReport = (
       margin-top: 5px;
     }
 
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 20px 0;
       background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      min-width: 600px;
     }
 
     thead {
@@ -218,18 +223,19 @@ export const generateHTMLReport = (
     }
 
     th {
-      padding: 15px;
+      padding: 12px 8px;
       text-align: left;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
     }
 
     td {
-      padding: 15px;
+      padding: 12px 8px;
       border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     tbody tr:hover {
@@ -339,6 +345,25 @@ export const generateHTMLReport = (
 
       .section {
         page-break-inside: avoid;
+      }
+
+      table {
+        font-size: 9px;
+        min-width: auto;
+      }
+
+      th {
+        padding: 8px 4px;
+        font-size: 8px;
+      }
+
+      td {
+        padding: 8px 4px;
+        font-size: 9px;
+      }
+
+      .table-wrapper {
+        overflow-x: visible;
       }
     }
   </style>
@@ -492,37 +517,39 @@ export const generateHTMLReport = (
           <div class="section-icon">💰</div>
           <h2 class="section-title">Financial Structure</h2>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Component</th>
-              <th class="text-right">Amount</th>
-              <th class="text-right">Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Total Project Cost</td>
-              <td class="text-right">${formatCurrency(grandTotalCost)}</td>
-              <td class="text-right">100.0%</td>
-            </tr>
-            <tr>
-              <td>Promoter's Contribution</td>
-              <td class="text-right">${formatCurrency(parseFloat(projectData.promotersContribution || '0'))}</td>
-              <td class="text-right">${((parseFloat(projectData.promotersContribution || '0') / grandTotalCost) * 100).toFixed(1)}%</td>
-            </tr>
-            <tr>
-              <td>Subsidy</td>
-              <td class="text-right">${formatCurrency(parseFloat(projectData.subsidy || '0'))}</td>
-              <td class="text-right">${((parseFloat(projectData.subsidy || '0') / grandTotalCost) * 100).toFixed(1)}%</td>
-            </tr>
-            <tr>
-              <td>Bank Loan</td>
-              <td class="text-right">${formatCurrency(calculatedResults.loanAmount)}</td>
-              <td class="text-right">${((calculatedResults.loanAmount / grandTotalCost) * 100).toFixed(1)}%</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Total Project Cost</td>
+                <td class="text-right">${formatCurrency(grandTotalCost)}</td>
+                <td class="text-right">100.0%</td>
+              </tr>
+              <tr>
+                <td>Promoter's Contribution</td>
+                <td class="text-right">${formatCurrency(parseFloat(projectData.promotersContribution || '0'))}</td>
+                <td class="text-right">${((parseFloat(projectData.promotersContribution || '0') / grandTotalCost) * 100).toFixed(1)}%</td>
+              </tr>
+              <tr>
+                <td>Subsidy</td>
+                <td class="text-right">${formatCurrency(parseFloat(projectData.subsidy || '0'))}</td>
+                <td class="text-right">${((parseFloat(projectData.subsidy || '0') / grandTotalCost) * 100).toFixed(1)}%</td>
+              </tr>
+              <tr>
+                <td>Bank Loan</td>
+                <td class="text-right">${formatCurrency(calculatedResults.loanAmount)}</td>
+                <td class="text-right">${((calculatedResults.loanAmount / grandTotalCost) * 100).toFixed(1)}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div class="info-grid">
           <div class="info-item">
             <div class="info-label">Interest Rate</div>
@@ -544,24 +571,26 @@ export const generateHTMLReport = (
           <div class="section-icon">📈</div>
           <h2 class="section-title">Cost Breakdown</h2>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th class="text-right">Amount</th>
-              <th class="text-right">Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${calculatedResults.costBreakdown.map(item => `
-            <tr>
-              <td>${item.category}</td>
-              <td class="text-right">${formatCurrency(item.amount)}</td>
-              <td class="text-right">${item.percentage.toFixed(1)}%</td>
-            </tr>
-            `).join('')}
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calculatedResults.costBreakdown.map(item => `
+              <tr>
+                <td>${item.category}</td>
+                <td class="text-right">${formatCurrency(item.amount)}</td>
+                <td class="text-right">${item.percentage.toFixed(1)}%</td>
+              </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="section">
@@ -569,32 +598,34 @@ export const generateHTMLReport = (
           <div class="section-icon">📊</div>
           <h2 class="section-title">Profitability Statement (7 Years)</h2>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th class="text-right">Revenue</th>
-              <th class="text-right">Expenses</th>
-              <th class="text-right">EBITDA</th>
-              <th class="text-right">Interest</th>
-              <th class="text-right">Depreciation</th>
-              <th class="text-right">Net Profit</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${calculatedResults.profitabilityStatement.slice(0, 7).map(item => `
-            <tr>
-              <td>Year ${item.year}</td>
-              <td class="text-right">${formatCurrency(item.income)}</td>
-              <td class="text-right">${formatCurrency(item.totalExpenses)}</td>
-              <td class="text-right">${formatCurrency(item.netIncomeBeforeID)}</td>
-              <td class="text-right">${formatCurrency(item.interest)}</td>
-              <td class="text-right">${formatCurrency(item.depreciation)}</td>
-              <td class="text-right">${formatCurrency(item.netProfitBeforeTax)}</td>
-            </tr>
-            `).join('')}
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th class="text-right">Revenue</th>
+                <th class="text-right">Expenses</th>
+                <th class="text-right">EBITDA</th>
+                <th class="text-right">Interest</th>
+                <th class="text-right">Depreciation</th>
+                <th class="text-right">Net Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calculatedResults.profitabilityStatement.slice(0, 7).map(item => `
+              <tr>
+                <td>Year ${item.year}</td>
+                <td class="text-right">${formatCurrency(item.income)}</td>
+                <td class="text-right">${formatCurrency(item.totalExpenses)}</td>
+                <td class="text-right">${formatCurrency(item.netIncomeBeforeID)}</td>
+                <td class="text-right">${formatCurrency(item.interest)}</td>
+                <td class="text-right">${formatCurrency(item.depreciation)}</td>
+                <td class="text-right">${formatCurrency(item.netProfitBeforeTax)}</td>
+              </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="section">
@@ -602,28 +633,30 @@ export const generateHTMLReport = (
           <div class="section-icon">💵</div>
           <h2 class="section-title">Cash Flow Statement (7 Years)</h2>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th class="text-right">Net Profit</th>
-              <th class="text-right">Add: Depreciation</th>
-              <th class="text-right">Add: Interest</th>
-              <th class="text-right">Net Cash Accruals</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${calculatedResults.cashFlowStatement.slice(0, 7).map(item => `
-            <tr>
-              <td>Year ${item.year}</td>
-              <td class="text-right">${formatCurrency(item.netProfit)}</td>
-              <td class="text-right">${formatCurrency(item.addDepreciation)}</td>
-              <td class="text-right">${formatCurrency(item.addInterest)}</td>
-              <td class="text-right">${formatCurrency(item.netCashAccruals)}</td>
-            </tr>
-            `).join('')}
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th class="text-right">Net Profit</th>
+                <th class="text-right">Add: Depreciation</th>
+                <th class="text-right">Add: Interest</th>
+                <th class="text-right">Net Cash Accruals</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calculatedResults.cashFlowStatement.slice(0, 7).map(item => `
+              <tr>
+                <td>Year ${item.year}</td>
+                <td class="text-right">${formatCurrency(item.netProfit)}</td>
+                <td class="text-right">${formatCurrency(item.addDepreciation)}</td>
+                <td class="text-right">${formatCurrency(item.addInterest)}</td>
+                <td class="text-right">${formatCurrency(item.netCashAccruals)}</td>
+              </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="section">
@@ -642,26 +675,28 @@ export const generateHTMLReport = (
             }
           </p>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th class="text-right">Net Cash Accrual</th>
-              <th class="text-right">Debt Obligation</th>
-              <th class="text-right">DSCR</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${calculatedResults.dscrCalculation.data.map(item => `
-            <tr>
-              <td>Year ${item.year}</td>
-              <td class="text-right">${formatCurrency(item.netCashAccrual)}</td>
-              <td class="text-right">${formatCurrency(item.debtObligation)}</td>
-              <td class="text-right">${item.dscr.toFixed(2)}</td>
-            </tr>
-            `).join('')}
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th class="text-right">Net Cash Accrual</th>
+                <th class="text-right">Debt Obligation</th>
+                <th class="text-right">DSCR</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calculatedResults.dscrCalculation.data.map(item => `
+              <tr>
+                <td>Year ${item.year}</td>
+                <td class="text-right">${formatCurrency(item.netCashAccrual)}</td>
+                <td class="text-right">${formatCurrency(item.debtObligation)}</td>
+                <td class="text-right">${item.dscr.toFixed(2)}</td>
+              </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="section">
