@@ -113,90 +113,123 @@ export const exportToCSV = (projectData: ProjectData): void => {
   }
 };
 
+// Helper function to parse CSV line with proper quote handling
+const parseCSVLine = (line: string): string[] => {
+  const result: string[] = [];
+  let currentValue = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (insideQuotes && line[i + 1] === '"') {
+        currentValue += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      result.push(currentValue.trim());
+      currentValue = '';
+    } else {
+      currentValue += char;
+    }
+  }
+
+  result.push(currentValue.trim());
+  return result.map(val => parseCSVValue(val));
+};
+
 // Import project data from CSV format
 export const importFromCSV = (file: File): Promise<ProjectData> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const csvContent = e.target?.result as string;
+        if (!csvContent || csvContent.trim().length === 0) {
+          throw new Error('CSV file is empty');
+        }
+
         const lines = csvContent.split('\n').filter(line => line.trim());
-        
+
         if (lines.length < 2) {
           throw new Error('Invalid CSV format: File must contain header and data rows');
         }
-        
-        // Parse header row
-        const headers = lines[0].split(',').map(header => header.trim());
-        
-        // Parse data row
-        const dataValues: string[] = [];
-        let currentValue = '';
-        let insideQuotes = false;
-        
-        for (let i = 0; i < lines[1].length; i++) {
-          const char = lines[1][i];
-          
-          if (char === '"') {
-            if (insideQuotes && lines[1][i + 1] === '"') {
-              // Escaped quote
-              currentValue += '"';
-              i++; // Skip next quote
-            } else {
-              // Toggle quote state
-              insideQuotes = !insideQuotes;
-            }
-          } else if (char === ',' && !insideQuotes) {
-            // End of field
-            dataValues.push(parseCSVValue(currentValue.trim()));
-            currentValue = '';
-          } else {
-            currentValue += char;
-          }
+
+        let headers: string[] = [];
+        let dataValues: string[] = [];
+
+        try {
+          headers = parseCSVLine(lines[0]).map(h => h.replace(/"/g, '').trim());
+        } catch (error) {
+          console.warn('Error parsing headers, using default headers:', error);
+          headers = [...CSV_HEADERS];
         }
-        
-        // Add the last value
-        if (currentValue) {
-          dataValues.push(parseCSVValue(currentValue.trim()));
+
+        try {
+          dataValues = parseCSVLine(lines[1]);
+        } catch (error) {
+          console.error('Error parsing data row:', error);
+          throw new Error('Failed to parse data row. Please check CSV format.');
         }
-        
-        // Create project data object
+
         const projectData: Partial<ProjectData> = {};
-        
+        let importedFieldsCount = 0;
+
         headers.forEach((header, index) => {
-          const cleanHeader = header.replace(/"/g, '').trim();
-          if (CSV_HEADERS.includes(cleanHeader) && index < dataValues.length) {
-            projectData[cleanHeader as keyof ProjectData] = dataValues[index] || '';
+          try {
+            const cleanHeader = header.replace(/"/g, '').trim();
+
+            if (CSV_HEADERS.includes(cleanHeader)) {
+              const value = index < dataValues.length ? dataValues[index] : '';
+
+              if (value && value.trim() !== '') {
+                projectData[cleanHeader as keyof ProjectData] = value.trim();
+                importedFieldsCount++;
+              } else {
+                projectData[cleanHeader as keyof ProjectData] = '';
+              }
+            }
+          } catch (error) {
+            console.warn(`Skipping field ${header} due to error:`, error);
           }
         });
-        
-        // Validate required fields
-        const requiredFields = ['beneficiaryName', 'projectName'];
-        const missingFields = requiredFields.filter(field => !projectData[field as keyof ProjectData]);
-        
-        if (missingFields.length > 0) {
-          throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+
+        if (importedFieldsCount === 0) {
+          throw new Error('No valid data found in CSV file');
         }
-        
-        // Fill in any missing fields with empty strings
+
+        const hasMinimumData =
+          projectData.beneficiaryName ||
+          projectData.projectName ||
+          projectData.fatherName;
+
+        if (!hasMinimumData) {
+          throw new Error('CSV must contain at least one of: beneficiaryName, projectName, or fatherName');
+        }
+
         CSV_HEADERS.forEach(header => {
           if (!(header in projectData)) {
             projectData[header as keyof ProjectData] = '';
           }
         });
-        
+
+        console.log(`Successfully imported ${importedFieldsCount} fields from CSV`);
         resolve(projectData as ProjectData);
+
       } catch (error) {
         console.error('Error parsing CSV:', error);
         reject(new Error(`Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`));
       }
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Failed to read CSV file'));
     };
-    
+
     reader.readAsText(file);
   });
 };
