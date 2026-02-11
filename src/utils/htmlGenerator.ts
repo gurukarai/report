@@ -595,6 +595,43 @@ export const generateHTMLReport = (
 
       <div class="section">
         <div class="section-header">
+          <div class="section-icon">🏦</div>
+          <h2 class="section-title">Loan Repayment Schedule</h2>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th class="text-right">Opening Balance</th>
+                <th class="text-right">Principal Payment</th>
+                <th class="text-right">Interest Payment</th>
+                <th class="text-right">Total EMI</th>
+                <th class="text-right">Closing Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calculatedResults.loanRepaymentSchedule.map((item, index, array) => {
+                const totalEMI = item.principal + item.interest;
+                const closingBalance = item.outstandingPrincipalStart - item.principal;
+                return `
+              <tr>
+                <td>Year ${item.year}</td>
+                <td class="text-right">${formatCurrency(item.outstandingPrincipalStart)}</td>
+                <td class="text-right">${formatCurrency(item.principal)}</td>
+                <td class="text-right">${formatCurrency(item.interest)}</td>
+                <td class="text-right">${formatCurrency(totalEMI)}</td>
+                <td class="text-right">${formatCurrency(closingBalance)}</td>
+              </tr>
+              `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
           <div class="section-icon">📊</div>
           <h2 class="section-title">Profitability Statement (7 Years)</h2>
         </div>
