@@ -223,19 +223,19 @@ export const generateHTMLReport = (
     }
 
     th {
-      padding: 12px 8px;
+      padding: 14px 10px;
       text-align: left;
       font-weight: 600;
-      font-size: 11px;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.3px;
       white-space: nowrap;
     }
 
     td {
-      padding: 12px 8px;
+      padding: 14px 10px;
       border-bottom: 1px solid #e5e7eb;
-      font-size: 12px;
+      font-size: 14px;
     }
 
     tbody tr:hover {
@@ -348,18 +348,18 @@ export const generateHTMLReport = (
       }
 
       table {
-        font-size: 9px;
+        font-size: 10px;
         min-width: auto;
       }
 
       th {
-        padding: 8px 4px;
-        font-size: 8px;
+        padding: 8px 6px;
+        font-size: 10px;
       }
 
       td {
-        padding: 8px 4px;
-        font-size: 9px;
+        padding: 8px 6px;
+        font-size: 10px;
       }
 
       .table-wrapper {
